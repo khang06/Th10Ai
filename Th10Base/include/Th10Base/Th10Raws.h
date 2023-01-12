@@ -6,7 +6,8 @@ namespace th
 {
 	constexpr uint_t ITEM_MAX_COUNT = 2198;
 
-	constexpr uint_t BULLET_MAX_COUNT = 2001;
+	//constexpr uint_t BULLET_MAX_COUNT = 2001;
+	constexpr uint_t BULLET_MAX_COUNT = 4001; // Ultra only
 
 #pragma pack(1)
 
@@ -20,6 +21,7 @@ namespace th
 		float32_t itemGetRange;
 
 		int32_t stageFrame;
+		float32_t speed;
 	};
 
 	struct PlayerRaw
@@ -136,7 +138,7 @@ namespace th
 		byte_t unknown1[0x4];
 	};
 
-	static_assert(sizeof(BulletContainer) == 0x3E0B54);
+	//static_assert(sizeof(BulletContainer) == 0x3E0B54);
 
 	// 有2种大小 0xD58 0xD74
 	struct LaserRaw

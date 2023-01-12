@@ -30,7 +30,7 @@ namespace th
 		const SharedStatus& getReadableStatus() const;
 
 		void notifyInput();
-		bool waitInput(const Time& timeout = Time(10));
+		bool waitInput(const Time& timeout = Time(1000));
 		Input& getWritableInput();
 		const Input& getReadableInput() const;
 

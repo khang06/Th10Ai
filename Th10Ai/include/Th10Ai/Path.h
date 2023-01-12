@@ -30,7 +30,7 @@ namespace th
 		Path(Status& status, Scene& scene,
 			const std::optional<Item>& itemTarget,
 			const std::optional<Enemy>& enemyTarget,
-			bool underEnemy);
+			bool underEnemy, bool anyItems);
 
 		Result find(DIR dir);
 		Result dfs(const Action& action);
@@ -57,5 +57,7 @@ namespace th
 
 		float_t m_bestScore;
 		int_t m_count;
+
+		bool m_anyItems;
 	};
 }

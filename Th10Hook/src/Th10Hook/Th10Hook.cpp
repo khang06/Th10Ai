@@ -56,7 +56,7 @@ namespace th
 		Th10Apis::GetPlayerTo(status.player);
 		Th10Apis::GetItemsTo(status.items);
 		Th10Apis::GetEnemiesTo(status.enemies);
-		Th10Apis::GetBulletsTo(status.bullets);
+		Th10Apis::GetBulletsTo(status.bullets, status.globalVar.speed);
 		Th10Apis::GetLasersTo(status.lasers);
 
 		//++statusFrame;

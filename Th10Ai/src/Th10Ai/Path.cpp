@@ -26,14 +26,16 @@ namespace th
 
 	const int_t Path::FIND_DIR_COUNTS[to_underlying(DIR::MAX_COUNT)] = { 1, 5, 5, 5, 5, 5, 5, 5, 5 };
 
-	const int_t Path::FIND_LIMIT = 120;
+	//const int_t Path::FIND_LIMIT = 120;
+	const int_t Path::FIND_LIMIT = 4096;
 	const float_t Path::FIND_DEPTH = 40;
-	const vec2 Path::RESET_POS = vec2(_F(0.0), _F(431.0));
+	//const float_t Path::FIND_DEPTH = 10;
+	const vec2 Path::RESET_POS = vec2(_F(0.0), _F(350.0));
 
 	Path::Path(Status& status, Scene& scene,
 		const std::optional<Item>& itemTarget,
 		const std::optional<Enemy>& enemyTarget,
-		bool underEnemy) :
+		bool underEnemy, bool anyItems) :
 		m_status(status),
 		m_scene(scene),
 		m_itemTarget(itemTarget),
@@ -42,7 +44,8 @@ namespace th
 		m_dir(DIR::HOLD),
 		m_slowFirst(false),
 		m_bestScore(std::numeric_limits<float_t>::lowest()),
-		m_count(0)
+		m_count(0),
+		m_anyItems(anyItems)
 	{
 	}
 
@@ -93,13 +96,18 @@ namespace th
 
 		result.valid = true;
 
-		if (m_itemTarget.has_value())
+		if (m_anyItems && !m_enemyTarget.has_value() && (!m_itemTarget.has_value() || (player.pos - m_itemTarget.value().pos).length() > player.pos.y - 120))
+		{
+			result.score += CalcNearScore(player.pos, Vector2(player.pos.x, 120)) * _F(100.0);
+		}
+		else if (m_itemTarget.has_value())
 		{
 			result.score += CalcNearScore(player.pos, m_itemTarget.value().pos) * _F(100.0);
 		}
 		else if (m_enemyTarget.has_value())
 		{
-			result.score += CalcShootScore(player.pos, m_enemyTarget.value().pos) * _F(100.0);
+			//result.score += CalcShootScore(player.pos, m_enemyTarget.value().pos) * _F(100.0);
+			result.score += CalcNearScore(player.pos, Vector2(m_enemyTarget.value().pos.x, RESET_POS.y)) * _F(100.0);
 		}
 		else
 		{

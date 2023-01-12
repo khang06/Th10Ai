@@ -22,6 +22,7 @@ namespace th
 		//	globalVar.itemGetRange *= _F(2.5);
 
 		globalVar.stageFrame = ReadMemory<int32_t>(0x00474C88);
+		globalVar.speed = ReadMemory<float32_t>(0x00476F78);
 
 		return true;
 	}
@@ -172,7 +173,7 @@ namespace th
 		return true;
 	}
 
-	bool Th10Apis::GetBulletsTo(ManagedVector<Bullet>& bullets)
+	bool Th10Apis::GetBulletsTo(ManagedVector<Bullet>& bullets, float32_t speed)
 	{
 		bullets.clear();
 
@@ -217,6 +218,7 @@ namespace th
 		//	ebx += 0x7F0;
 		//}
 
+		static BulletContainer last_container = {};
 		const BulletContainer* container = ReadMemory<const BulletContainer*>(0x004776F0);
 		if (container == nullptr)
 			return false;
@@ -225,9 +227,18 @@ namespace th
 		for (uint_t i = 0; i < BULLET_MAX_COUNT - 1; ++i)
 		{
 			const BulletRaw* raw = &(container->bullets[i]);
-			if (raw->status != 0)
-				bullets.emplace_back(raw, i);
+			if (raw->status != 0) {
+				Bullet bullet(raw, i);
+				if (last_container.bullets[i].status != 0) {
+					Vector2 new_delta(raw->x - last_container.bullets[i].x, raw->y - last_container.bullets[i].y);
+					//if ((new_delta - bullet.delta).length() > 2)
+					//	printf("%f %f -> %f %f\n", bullet.delta.x, bullet.delta.y, new_delta.x, new_delta.y);
+					bullet.delta = new_delta / speed;
+				}
+				bullets.push_back(bullet);
+			}
 		}
+		memcpy(&last_container, container, sizeof(BulletContainer));
 		//if (bullets.size() != container->bulletCount)
 		//	std::cout << "读取到的子弹数量不一致。" << std::endl;
 

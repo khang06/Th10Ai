@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Th10Base/Player.h"
 
 namespace th
@@ -31,6 +32,8 @@ namespace th
 		if (slow)
 		{
 			vec2 offset = MOVE_SPEED_LOW[to_underlying(dir)];
+			offset.x = std::clamp(offset.x, -184 - pos.x, 184 - pos.x);
+			offset.y = std::clamp(offset.y, 32 - pos.y, 432 - pos.y);
 			pos += offset;
 			translate(offset);
 		}
@@ -39,12 +42,16 @@ namespace th
 			if (isMarisa())
 			{
 				vec2 offset = MOVE_SPEED_HIGH_MARISA[to_underlying(dir)];
+				offset.x = std::clamp(offset.x, -184 - pos.x, 184 - pos.x);
+				offset.y = std::clamp(offset.y, 32 - pos.y, 432 - pos.y);
 				pos += offset;
 				translate(offset);
 			}
 			else
 			{
 				vec2 offset = MOVE_SPEED_HIGH[to_underlying(dir)];
+				offset.x = std::clamp(offset.x, -184 - pos.x, 184 - pos.x);
+				offset.y = std::clamp(offset.y, 32 - pos.y, 432 - pos.y);
 				pos += offset;
 				translate(offset);
 			}

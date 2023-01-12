@@ -19,7 +19,7 @@ namespace th
 		static bool GetPlayerTo(Player& player);
 		static bool GetItemsTo(ManagedVector<Item>& items);
 		static bool GetEnemiesTo(ManagedVector<Enemy>& enemies);
-		static bool GetBulletsTo(ManagedVector<Bullet>& bullets);
+		static bool GetBulletsTo(ManagedVector<Bullet>& bullets, float32_t speed);
 		static bool GetLasersTo(ManagedVector<Laser>& lasers);
 	};
 }

@@ -42,6 +42,8 @@ namespace th
 		void splitLasers(const std::vector<Laser>& lasers);
 		RegionCollideResult collideAll(const Player& player, int_t frame) const;
 		RegionCollideResult collideAll(const Player& player, int_t frame, const Bullet& target) const;
+		void advance();
+		void unadvance();
 
 #if RENDER
 		void render(cv::Mat& mat, const Player& player);

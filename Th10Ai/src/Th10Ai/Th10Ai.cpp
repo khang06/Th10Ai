@@ -226,6 +226,14 @@ namespace th
 			std::cout << t2 - t1 << ' ' << t3 - t2 << ' ' << t4 - t3 << std::endl;
 
 		m_sharedData->notifyInput();
+		//printf("%zu\n", m_status.getBullets().size());
+
+#if RENDER
+		cv::Mat img = cv::Mat::zeros(cv::Size(640, 480), CV_8UC1);
+		m_scene.render(img, m_status.getPlayer());
+		cv::imshow("Display window", img);
+		cv::waitKey(1);
+#endif
 
 		return true;
 	}
@@ -313,7 +321,7 @@ namespace th
 
 		for (DIR dir : DIRS)
 		{
-			Path path(m_status, m_scene, itemTarget, enemyTarget, underEnemy);
+			Path path(m_status, m_scene, itemTarget, enemyTarget, underEnemy, !m_status.getItems().empty());
 			Result result = path.find(dir);
 
 			if (result.valid && path.m_bestScore > bestScore)
@@ -432,8 +440,8 @@ namespace th
 			return target;
 
 		// 自机高于1/4屏
-		if (player.pos.y < Scene::SIZE.y / 4)
-			return target;
+		//if (player.pos.y < Scene::SIZE.y / 4)
+		//	return target;
 
 		float_t minDist = std::numeric_limits<float_t>::max();
 		for (const Enemy& enemy : enemies)
@@ -443,8 +451,8 @@ namespace th
 				continue;
 
 			// 敌机在自机下面
-			if (enemy.pos.y > player.pos.y)
-				continue;
+			//if (enemy.pos.y > player.pos.y)
+			//	continue;
 
 			// 敌机与自机X轴距离最近
 			float_t dx = std::abs(enemy.pos.x - player.pos.x);
