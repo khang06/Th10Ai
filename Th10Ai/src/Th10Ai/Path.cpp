@@ -27,17 +27,15 @@ namespace th
 	const int_t Path::FIND_DIR_COUNTS[to_underlying(DIR::MAX_COUNT)] = { 1, 5, 5, 5, 5, 5, 5, 5, 5 };
 
 	//const int_t Path::FIND_LIMIT = 120;
-	const int_t Path::FIND_LIMIT = 4096;
-	const float_t Path::FIND_DEPTH = 40;
-	//const float_t Path::FIND_DEPTH = 10;
-	const vec2 Path::RESET_POS = vec2(_F(0.0), _F(350.0));
+	//const float_t Path::FIND_DEPTH = 40;
+	const vec2 Path::RESET_POS = vec2(_F(0.0), _F(375.0));
 
-	Path::Path(Status& status, Scene& scene,
+	Path::Path(Status& status, Scene* scenes,
 		const std::optional<Item>& itemTarget,
 		const std::optional<Enemy>& enemyTarget,
 		bool underEnemy, bool anyItems) :
 		m_status(status),
-		m_scene(scene),
+		m_scenes(scenes),
 		m_itemTarget(itemTarget),
 		m_enemyTarget(enemyTarget),
 		m_underEnemy(underEnemy),
@@ -82,13 +80,13 @@ namespace th
 		result.slow = m_slowFirst;
 		RegionCollideResult rcr = {};
 		if (!Scene::IsInPlayerRegion(player.pos)
-			|| (rcr = m_scene.collideAll(player, action.frame)).collided)
+			|| (rcr = m_scenes[action.frame - 1].collideAll(player)).collided)
 		{
 			player.setPosition(action.fromPos);
 			player.move(action.fromDir, !m_slowFirst);
 			result.slow = !m_slowFirst;
 			if (!Scene::IsInPlayerRegion(player.pos)
-				|| (rcr = m_scene.collideAll(player, action.frame)).collided)
+				|| (rcr = m_scenes[action.frame - 1].collideAll(player)).collided)
 			{
 				return result;
 			}
@@ -107,11 +105,13 @@ namespace th
 		else if (m_enemyTarget.has_value())
 		{
 			//result.score += CalcShootScore(player.pos, m_enemyTarget.value().pos) * _F(100.0);
-			result.score += CalcNearScore(player.pos, Vector2(m_enemyTarget.value().pos.x, RESET_POS.y)) * _F(100.0);
+			//result.score += CalcNearScore(player.pos, Vector2(m_enemyTarget.value().pos.x, RESET_POS.y)) * _F(100.0);
+			result.score += CalcRelaxedNearScore(player.pos, Vector2(m_enemyTarget.value().pos.x, RESET_POS.y), _F(16.0)) * _F(100.0);
 		}
 		else
 		{
-			result.score += CalcNearScore(player.pos, RESET_POS) * _F(100.0);
+			//result.score += CalcNearScore(player.pos, RESET_POS) * _F(100.0);
+			result.score += CalcRelaxedNearScore(player.pos, RESET_POS, _F(64.0)) * _F(100.0);
 		}
 
 		float_t total = action.score + result.score;
@@ -187,6 +187,32 @@ namespace th
 			score += _F(0.5) * (1 - (target.y - player.y) / target.y);
 		else
 			score += _F(0.5) * (1 - (player.y - target.y) / (Scene::SIZE.y - target.y));
+
+		return score;
+	}
+
+	float_t Path::CalcRelaxedNearScore(vec2 player, vec2 target, float32_t radius)
+	{
+		float_t score = _F(0.0);
+
+		/*
+		// 坐标原点移到左上角
+		player += Scene::ORIGIN_POINT_OFFSET;
+		target += Scene::ORIGIN_POINT_OFFSET;
+
+		// 距离越近得分越高
+		if (player.x < target.x)
+			score += _F(0.5) * (1 - (target.x - player.x) / target.x);
+		else
+			score += _F(0.5) * (1 - (player.x - target.x) / (Scene::SIZE.x - target.x));
+
+		if (player.y < target.y)
+			score += _F(0.5) * (1 - (target.y - player.y) / target.y);
+		else
+			score += _F(0.5) * (1 - (player.y - target.y) / (Scene::SIZE.y - target.y));
+		*/
+
+		score += std::clamp(_F(1.0) - ((player - target).length() - radius) / Scene::SIZE.y, _F(0.0), _F(1.0));
 
 		return score;
 	}

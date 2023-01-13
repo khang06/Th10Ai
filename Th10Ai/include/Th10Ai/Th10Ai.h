@@ -19,6 +19,7 @@
 #include "Th10Base/Laser.h"
 #include "Th10Ai/Status.h"
 #include "Th10Ai/Scene.h"
+#include "Th10Ai/Path.h"
 //#include "Th10Ai/Input.h"
 
 namespace th
@@ -60,7 +61,7 @@ namespace th
 
 		//Scene m_scene2;
 		//Scene m_scene1;
-		Scene m_scene;
+		Scene m_scenes[Path::FIND_DEPTH];
 
 		Time m_bombTime;
 		int_t m_bombCount;

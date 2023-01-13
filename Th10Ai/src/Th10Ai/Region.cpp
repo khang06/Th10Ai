@@ -49,55 +49,64 @@ namespace th
 			m_second->clearAll();
 	}
 
-	void Region::splitEnemies(const std::vector<Enemy>& enemies)
+	void Region::splitEnemies(const std::vector<Enemy>& enemies, int32_t frame)
 	{
-		for (const Enemy& enemy : enemies)
+		// TODO: Do this without an unnecessary copy
+		for (Enemy enemy : enemies)
 		{
-			if (enemy.willCollideWith(*this))
+			enemy.advance(frame);
+			//if (enemy.willCollideWith(*this))
+			if (enemy.collide(*this))
 				m_enemies.push_back(enemy);
 		}
 		if (m_enemies.empty())
 			return;
 
 		if (m_first != nullptr)
-			m_first->splitEnemies(m_enemies);
+			m_first->splitEnemies(m_enemies, 0);
 		if (m_second != nullptr)
-			m_second->splitEnemies(m_enemies);
+			m_second->splitEnemies(m_enemies, 0);
 	}
 
-	void Region::splitBullets(const std::vector<Bullet>& bullets)
+	void Region::splitBullets(const std::vector<Bullet>& bullets, int32_t frame)
 	{
-		for (const Bullet& bullet : bullets)
+		// TODO: Do this without an unnecessary copy
+		for (Bullet bullet : bullets)
 		{
-			if (bullet.willCollideWith(*this))// || bullet.collide(*this))
+			bullet.advance(frame);
+			//if (bullet.willCollideWith(*this))// || bullet.collide(*this))
+			if (bullet.collide(*this))
 				m_bullets.push_back(bullet);
 		}
 		if (m_bullets.empty())
 			return;
 
 		if (m_first != nullptr)
-			m_first->splitBullets(m_bullets);
+			m_first->splitBullets(m_bullets, 0);
 		if (m_second != nullptr)
-			m_second->splitBullets(m_bullets);
+			m_second->splitBullets(m_bullets, 0);
 	}
 
-	void Region::splitLasers(const std::vector<Laser>& lasers)
+	void Region::splitLasers(const std::vector<Laser>& lasers, int32_t frame)
 	{
-		for (const Laser& laser : lasers)
+		// TODO: Do this without an unnecessary copy
+		for (Laser laser : lasers)
 		{
-			if (laser.willCollideWith(*this))
+			laser.advance(frame);
+			//if (laser.willCollideWith(*this))
+			if (laser.collide(*this))
 				m_lasers.push_back(laser);
 		}
 		if (m_lasers.empty())
 			return;
 
 		if (m_first != nullptr)
-			m_first->splitLasers(m_lasers);
+			m_first->splitLasers(m_lasers, 0);
 		if (m_second != nullptr)
-			m_second->splitLasers(m_lasers);
+			m_second->splitLasers(m_lasers, 0);
 	}
 
-	RegionCollideResult Region::collideAll(const Player& player, int_t frame) const
+	RegionCollideResult Region::collideAll(const Player& player) const
 	{
 		RegionCollideResult result = {};
 
@@ -107,59 +116,50 @@ namespace th
 		// 只检测叶子节点
 		if (m_first == nullptr && m_second == nullptr)
 		{
-			for (Enemy enemy : m_enemies)
+			for (const Enemy& enemy : m_enemies)
 			{
-				enemy.advance(frame);
 				if (enemy.collide(player))
 				{
-					enemy.advance(-frame);
 					result.collided = true;
 					break;
 				}
-				enemy.advance(-frame);
 			}
 
 			if (!result.collided)
 			{
-				for (Bullet bullet : m_bullets)
+				for (const Bullet& bullet : m_bullets)
 				{
-					bullet.advance(frame);
 					if (bullet.collide(player))
 					{
-						bullet.advance(-frame);
 						result.collided = true;
 						break;
 					}
-					bullet.advance(-frame);
 				}
 			}
 
 			if (!result.collided)
 			{
-				for (Laser laser : m_lasers)
+				for (const Laser& laser : m_lasers)
 				{
-					laser.advance(frame);
 					if (laser.collide(player))
 					{
-						laser.advance(-frame);
 						result.collided = true;
 						break;
 					}
-					laser.advance(-frame);
 				}
 			}
 		}
 
 		if (m_first != nullptr)
 		{
-			RegionCollideResult firstResult = m_first->collideAll(player, frame);
+			RegionCollideResult firstResult = m_first->collideAll(player);
 			if (firstResult.collided)
 				result.collided = true;
 		}
 
 		if (m_second != nullptr)
 		{
-			RegionCollideResult secondResult = m_second->collideAll(player, frame);
+			RegionCollideResult secondResult = m_second->collideAll(player);
 			if (secondResult.collided)
 				result.collided = true;
 		}
@@ -167,7 +167,7 @@ namespace th
 		return result;
 	}
 
-	RegionCollideResult Region::collideAll(const Player& player, int_t frame, const Bullet& target) const
+	RegionCollideResult Region::collideAll(const Player& player, const Bullet& target) const
 	{
 		RegionCollideResult result = {};
 
@@ -230,23 +230,19 @@ namespace th
 
 		if (m_first != nullptr)
 		{
-			RegionCollideResult firstResult = m_first->collideAll(player, frame, target);
+			RegionCollideResult firstResult = m_first->collideAll(player, target);
 			if (firstResult.collided)
 				result.collided = true;
 		}
 
 		if (m_second != nullptr)
 		{
-			RegionCollideResult secondResult = m_second->collideAll(player, frame, target);
+			RegionCollideResult secondResult = m_second->collideAll(player, target);
 			if (secondResult.collided)
 				result.collided = true;
 		}
 
 		return result;
-	}
-
-	void Region::unadvance() {
-
 	}
 
 #if RENDER

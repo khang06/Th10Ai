@@ -35,29 +35,29 @@ namespace th
 		m_region.clearAll();
 	}
 
-	void Scene::splitEnemies(const std::vector<Enemy>& enemies)
+	void Scene::splitEnemies(const std::vector<Enemy>& enemies, int32_t frame)
 	{
-		m_region.splitEnemies(enemies);
+		m_region.splitEnemies(enemies, frame);
 	}
 
-	void Scene::splitBullets(const std::vector<Bullet>& bullets)
+	void Scene::splitBullets(const std::vector<Bullet>& bullets, int32_t frame)
 	{
-		m_region.splitBullets(bullets);
+		m_region.splitBullets(bullets, frame);
 	}
 
-	void Scene::splitLasers(const std::vector<Laser>& lasers)
+	void Scene::splitLasers(const std::vector<Laser>& lasers, int32_t frame)
 	{
-		m_region.splitLasers(lasers);
+		m_region.splitLasers(lasers, frame);
 	}
 
-	RegionCollideResult Scene::collideAll(const Player& player, int_t frame) const
+	RegionCollideResult Scene::collideAll(const Player& player) const
 	{
-		return m_region.collideAll(player, frame);
+		return m_region.collideAll(player);
 	}
 
-	RegionCollideResult Scene::collideAll(const Player& player, int_t frame, const Bullet& target) const
+	RegionCollideResult Scene::collideAll(const Player& player, const Bullet& target) const
 	{
-		return m_region.collideAll(player, frame, target);
+		return m_region.collideAll(player, target);
 	}
 
 #if RENDER

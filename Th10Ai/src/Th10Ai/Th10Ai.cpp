@@ -10,6 +10,7 @@
 #include <Base/ScopeGuard.h>
 #include <Base/Error.h>
 #include <Base/Windows/Apis.h>
+#include <ppl.h>
 
 #include "Th10Ai/DllInject.h"
 
@@ -206,10 +207,13 @@ namespace th
 
 		Time t2 = Clock::Now();
 
-		m_scene.clearAll();
-		m_scene.splitEnemies(m_status.getEnemies());
-		m_scene.splitBullets(m_status.getBullets());
-		m_scene.splitLasers(m_status.getLasers());
+		//for (int i = 0; i < Path::FIND_DEPTH; i++) {
+		concurrency::parallel_for(0, Path::FIND_DEPTH, [&](int i){
+			m_scenes[i].clearAll();
+			m_scenes[i].splitEnemies(m_status.getEnemies(), i + 1);
+			m_scenes[i].splitBullets(m_status.getBullets(), i + 1);
+			m_scenes[i].splitLasers(m_status.getLasers(), i + 1);
+		});
 
 		Time t3 = Clock::Now();
 
@@ -321,7 +325,7 @@ namespace th
 
 		for (DIR dir : DIRS)
 		{
-			Path path(m_status, m_scene, itemTarget, enemyTarget, underEnemy, !m_status.getItems().empty());
+			Path path(m_status, m_scenes, itemTarget, enemyTarget, underEnemy, !m_status.getItems().empty());
 			Result result = path.find(dir);
 
 			if (result.valid && path.m_bestScore > bestScore)

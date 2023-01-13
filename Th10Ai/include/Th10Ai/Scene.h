@@ -61,11 +61,11 @@ namespace th
 		Scene();
 
 		void clearAll();
-		void splitEnemies(const std::vector<Enemy>& enemies);
-		void splitBullets(const std::vector<Bullet>& bullets);
-		void splitLasers(const std::vector<Laser>& lasers);
-		RegionCollideResult collideAll(const Player& player, int_t frame) const;
-		RegionCollideResult collideAll(const Player& player, int_t frame, const Bullet& target) const;
+		void splitEnemies(const std::vector<Enemy>& enemies, int32_t frame);
+		void splitBullets(const std::vector<Bullet>& bullets, int32_t frame);
+		void splitLasers(const std::vector<Laser>& lasers, int32_t frame);
+		RegionCollideResult collideAll(const Player& player) const;
+		RegionCollideResult collideAll(const Player& player, const Bullet& target) const;
 
 #if RENDER
 		void render(cv::Mat& mat, const Player& player);

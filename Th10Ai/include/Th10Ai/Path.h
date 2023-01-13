@@ -27,7 +27,10 @@ namespace th
 	class Path
 	{
 	public:
-		Path(Status& status, Scene& scene,
+		static constexpr int_t FIND_LIMIT = 8192;
+		static constexpr int_t FIND_DEPTH = 40;
+
+		Path(Status& status, Scene* scenes,
 			const std::optional<Item>& itemTarget,
 			const std::optional<Enemy>& enemyTarget,
 			bool underEnemy, bool anyItems);
@@ -38,16 +41,15 @@ namespace th
 	//private:
 		static float_t CalcFarScore(vec2 player, vec2 target);
 		static float_t CalcNearScore(vec2 player, vec2 target);
+		static float_t CalcRelaxedNearScore(vec2 player, vec2 target, float32_t radius);
 		static float_t CalcShootScore(vec2 player, vec2 target);
 
 		static const DIR FIND_DIRS[to_underlying(DIR::MAX_COUNT)][5];
 		static const int_t FIND_DIR_COUNTS[to_underlying(DIR::MAX_COUNT)];
-		static const int_t FIND_LIMIT;
-		static const float_t FIND_DEPTH;
 		static const vec2 RESET_POS;
 
 		Status& m_status;
-		Scene& m_scene;
+		Scene* m_scenes;
 		const std::optional<Item>& m_itemTarget;
 		const std::optional<Enemy>& m_enemyTarget;
 		bool m_underEnemy;
